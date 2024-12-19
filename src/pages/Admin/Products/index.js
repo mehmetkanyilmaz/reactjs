@@ -5,7 +5,7 @@ import { fetchProductList, deleteProduct } from "../../../api"
 
 import { Link } from 'react-router-dom'
 import { Flex, Text } from "@chakra-ui/react"
-import { Table, Popconfirm, Button } from "antd"
+import { Table, Popconfirm, Button, message } from "antd"
 
 function Products() {
 
@@ -14,7 +14,12 @@ function Products() {
   const { isLoading, isError, data, error } = useQuery("admin:products", fetchProductList)
 
   const deleteMutation = useMutation(deleteProduct, {
-    onSuccess: () => queryClient.invalidateQueries("admin:products")
+    onSuccess: () => queryClient.invalidateQueries("admin:products"),
+    onError: (e) => { message.error({
+              content: e.response?.data.Detail,
+              key:"product_delete",
+              duration:2
+    })}
   });
 
   const colums = useMemo(() => {
@@ -80,7 +85,7 @@ function Products() {
         </Link>
       </Flex>
 
-      <Table dataSource={data} columns={colums} rowKey="id"></Table>
+      <Table dataSource={data.items} columns={colums} rowKey="id"></Table>
     </div>
   )
 }

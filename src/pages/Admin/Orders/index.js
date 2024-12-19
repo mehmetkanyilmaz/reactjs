@@ -10,7 +10,7 @@ function Orders() {
     "admin:orders",
     fetchOrders
   )
-  console.log("data", data)
+
   if(isLoading) {
     return <div>Loading...</div>
   }
@@ -29,19 +29,23 @@ function Orders() {
         <TableCaption>Table Caption</TableCaption>
         <Thead>
           <Tr>
-            <Td>User</Td>
+            <Td>Full Name</Td>
+            <Td>Email</Td>
             <Td>Address</Td>
-            <Td isNumeric>İtems</Td>
+            <Td>Total Price</Td>
+            <Td>İtems</Td>
           </Tr>
         </Thead>
         <Tbody>
           {
             
-            data.map((item) => (
+            data.items.map((item) => (
               <Tr key={item.id}>
-                  <Td>{item.user.email}</Td>
+                  <Td>{item.fullName}</Td>
+                  <Td>{item.email}</Td>
                   <Td>{item.address}</Td>
-                  <Td isNumeric>{item.items.length}</Td>
+                  <Td>{item.totalPrice}</Td>
+                  <Td>{item.items}</Td>
               </Tr>
             ))
           }

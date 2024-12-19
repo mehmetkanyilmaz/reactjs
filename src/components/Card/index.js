@@ -1,6 +1,5 @@
 import { Box, Image, Button } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
-import moment from "moment"
 
 import {useBasket} from "../../contexts/BasketContext"
 
@@ -11,16 +10,13 @@ function Card({ item }) {
     const findBasketItem = items.find((basketItem) => basketItem.id == item.id)
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" p="3">
+    <Box fontFamily="Roboto, sans-serif" fontSize={14} borderWidth="1px" borderStyle="solid" borderColor="#80808061" borderRadius="lg" overflow="hidden" p="2">
         <Link to={`/product/${item.id}`}>
             <Image src={item.thumbnail} alt="product" loading="lazy"></Image>
 
-            <Box p="6">
-                <Box d="flex" alignItems="baseline">
-                    {moment(item.createdAt).format('DD/MM/YYYY')}
-                </Box>
+            <Box p="2">
 
-                <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight">
+                <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight" maxLength={5}>
                     {item.title}
                 </Box>
 
@@ -28,7 +24,8 @@ function Card({ item }) {
             </Box>
         </Link>
 
-        <Button colorScheme={findBasketItem ? "pink":"green"} variant="solid" onClick={() => addToBasket(item, findBasketItem)}>
+        <Button fontSize={13} colorScheme={findBasketItem ? "pink":"green"} variant="outline" onClick={() => addToBasket(item, findBasketItem)} 
+            _hover={findBasketItem ? { bg: "pink.500", color: "white" } : {bg: "green.500", color: "white"}} width="100%">
             {
                 findBasketItem ? "Remove from basket" : "Add to basket"
             }

@@ -14,6 +14,7 @@ const BasketProvider = ({children}) => {
     const addToBasket = (data, findBasketItem) => {
 
         if(!findBasketItem) {
+            data.quantity = 1;
             return setItems((items) => [data, ...items]);
         }
 

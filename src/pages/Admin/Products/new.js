@@ -1,29 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 
 import { postProduct } from '../../../api'
 import { useMutation, useQueryClient } from 'react-query'
 
-import { Formik, FieldArray } from 'formik'
+import { Formik } from 'formik'
 import { Text, Box, FormControl, FormLabel, Input, Textarea, Button } from "@chakra-ui/react"
 import validationSchema from "./validations"
 
 import { message } from "antd"
 
+import styles from "./styles.module.css";
+
 function NewProduct() {
+
+    const [errorList, setErrorList] = useState([]);
 
     const queryClient = useQueryClient();
 
     const newPRoductMutation = useMutation(postProduct, {
-        onSuccess: () => queryClient.invalidateQueries("admin:products")});
+        onSuccess: () => { queryClient.invalidateQueries("admin:products"); queryClient.removeQueries('items'); },
+        onError: (e) => { setErrorList(e.response?.data.Errors) }});
 
     const handleSubmit = async (values, bag) => {
         message.loading({ content: "Loading...", key: "product_save" })
-
-        const newValues = {
-            ...values,
-            images: JSON.stringify(values.images)
-        }
 
         newPRoductMutation.mutate(values, { 
             onSuccess: () =>{ 
@@ -46,9 +46,10 @@ function NewProduct() {
             title: "",
             description: "",
             price: "",
-            images: []
+            stock: "",
+            thumbnail: ""
         }}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
     >
         {
@@ -94,34 +95,26 @@ function NewProduct() {
                                 ></Input>
                             </FormControl>
                             <FormControl mt="4">
-                                <FormLabel>Images</FormLabel>
-                                <FieldArray
-                                    name="images"
-                                    render={(arrayHelpers) => (
-                                        <div>
-                                            {
-                                                values.images && values.images.map((image, index) => (
-                                                    <div key={index}>
-                                                        <Input 
-                                                            name={`images.${index}`}
-                                                            value={image}
-                                                            disabled={isSubmitting}
-                                                            onChange={handleChange}
-                                                            width="3xl"
-                                                        />
-                                                        <Button ml="4" type="button" colorScheme="red" onClick={() => arrayHelpers.remove(index)}>
-                                                            Remove
-                                                        </Button>
-                                                    </div>
-                                                ))
-                                            }
-
-                                            <Button mt="5" onClick={() => arrayHelpers.push("")}>
-                                                Add a Image
-                                            </Button>
-                                        </div>
-                                    )}
-                                />
+                                <FormLabel>Stock</FormLabel>
+                                <Input
+                                    name="stock"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.stock}
+                                    disabled={isSubmitting}
+                                    isInvalid={touched.stock && errors.stock}
+                                ></Input>
+                            </FormControl>
+                            <FormControl mt="4">
+                                <FormLabel>Thumbnail</FormLabel>
+                                <Input
+                                    name="thumbnail"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.thumbnail}
+                                    disabled={isSubmitting}
+                                    isInvalid={touched.thumbnail && errors.thumbnail}
+                                ></Input>
                             </FormControl>
 
                             <Button mt="4" width="full" type="submit" isLoading={isSubmitting}>
@@ -134,6 +127,15 @@ function NewProduct() {
             </>
         }
     </Formik>
+    
+    <ul className={styles.itemList}>
+      {errorList.map((item, index) => (
+        <li key={index}>
+            <span className={styles.dot}></span> {item.ErrorMessage}
+        </li>
+      ))}
+    </ul>
+
   </div>
 
 }

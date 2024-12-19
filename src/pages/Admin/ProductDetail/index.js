@@ -1,14 +1,16 @@
-import React from 'react'
+import React , {useState} from 'react'
 
 import { useParams } from 'react-router-dom'
 import { fetchProduct, updateProduct } from '../../../api'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 
-import { Formik, FieldArray } from 'formik'
+import { Formik } from 'formik'
 import { Text, Box, FormControl, FormLabel, Input, Textarea, Button } from "@chakra-ui/react"
 import validationSchema from "./validations"
 
 import { message } from "antd"
+
+import styles from "../Products/styles.module.css";
 
 function AdminProductDetail() {
 
@@ -18,6 +20,27 @@ function AdminProductDetail() {
         ["admin:product", productId],
         () => fetchProduct(productId)
         )
+
+    const queryClient = useQueryClient();
+
+    const productUpdateMutation = useMutation(updateProduct, {
+        onSuccess: () => { 
+            queryClient.removeQueries("admin:products"); 
+            queryClient.invalidateQueries("admin:product", productId);
+            queryClient.removeQueries('items');
+
+            message.success({
+                content: "The product successfully updated",
+                key: "product_update",
+                duration: 2
+            })
+         },
+        onError: (e) => { 
+            setErrorList(e.response?.data.Errors)
+            message.error({content: "The product does not updated.", key: "product_update"})
+        }});
+
+    const [errorList, setErrorList] = useState([]);
 
     if(isLoading) {
         return <div>Loading...</div>
@@ -30,18 +53,7 @@ function AdminProductDetail() {
     const handleSubmit = async (values, bag) => {
         message.loading({ content: "Loading...", key: "product_update" })
 
-        try{
-            await updateProduct(values, productId)
-
-            message.success({
-                content: "The product successfully updated",
-                key: "product_update",
-                duration: 2
-            })
-        }
-        catch(e) {
-            message.error("The product does not updated.")
-        }
+        productUpdateMutation.mutate(values)
     }
 
   return <div>
@@ -49,10 +61,12 @@ function AdminProductDetail() {
 
     <Formik
         initialValues={{
+            id: productId,
             title: data.title,
             description: data.description,
             price: data.price,
-            images: data.images
+            stock: data.stock,
+            thumbnail: data.thumbnail
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -64,6 +78,7 @@ function AdminProductDetail() {
                     <Box my="5" textAlign="left">
                         <form onSubmit={handleSubmit}>
                             <FormControl>
+                                <input name="id" type="hidden" value={productId} />
                                 <FormLabel>Title</FormLabel>
                                 <Input
                                     name="title"
@@ -100,34 +115,26 @@ function AdminProductDetail() {
                                 ></Input>
                             </FormControl>
                             <FormControl mt="4">
-                                <FormLabel>Images</FormLabel>
-                                <FieldArray
-                                    name="images"
-                                    render={(arrayHelpers) => (
-                                        <div>
-                                            {
-                                                values.images && values.images.map((image, index) => (
-                                                    <div key={index}>
-                                                        <Input 
-                                                            name={`images.${index}`}
-                                                            value={image}
-                                                            disabled={isSubmitting}
-                                                            onChange={handleChange}
-                                                            width="3xl"
-                                                        />
-                                                        <Button ml="4" type="button" colorScheme="red" onClick={() => arrayHelpers.remove(index)}>
-                                                            Remove
-                                                        </Button>
-                                                    </div>
-                                                ))
-                                            }
-
-                                            <Button mt="5" onClick={() => arrayHelpers.push("")}>
-                                                Add a Image
-                                            </Button>
-                                        </div>
-                                    )}
-                                />
+                                <FormLabel>Stock</FormLabel>
+                                <Input
+                                    name="stock"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.stock}
+                                    disabled={isSubmitting}
+                                    isInvalid={touched.stock && errors.stock}
+                                ></Input>
+                            </FormControl>
+                            <FormControl mt="4">
+                                <FormLabel>Thumbnail</FormLabel>
+                                <Input
+                                    name="thumbnail"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.thumbnail}
+                                    disabled={isSubmitting}
+                                    isInvalid={touched.thumbnail && errors.thumbnail}
+                                ></Input>
                             </FormControl>
 
                             <Button mt="4" width="full" type="submit" isLoading={isSubmitting}>
@@ -140,6 +147,14 @@ function AdminProductDetail() {
             </>
         }
     </Formik>
+
+    <ul className={styles.itemList}>
+      {errorList.map((item, index) => (
+        <li key={index}>
+            <span className={styles.dot}></span> {item.ErrorMessage}
+        </li>
+      ))}
+    </ul>
   </div>
 
 }

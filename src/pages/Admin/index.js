@@ -2,22 +2,18 @@ import React from 'react'
 
 import "./styles.css"
 
-import { Box, Switch } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 
 import { useAuth } from '../../contexts/AuthContext';
 
-import { Link, Routes, Route, Outlet, useNavigate } from "react-router-dom";
-
-import Home from './Home';
-import Orders from './Orders';
-import Products from './Products';
+import { Link, Outlet, useNavigate } from "react-router-dom";
 
 function Admin() {
     const { user } = useAuth()
 
     const navigate = useNavigate();
 
-    if(user.role != "admin") {
+    if(user.role != "Admin") {
         return navigate("/");
     }
 

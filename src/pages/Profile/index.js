@@ -18,7 +18,9 @@ function Profile() {
     <div>
 
     <Text fontSize="22">Profile</Text>
-    <code>{JSON.stringify(user)}</code>
+    <Text fontSize="16">First Name: {user.fistName}</Text>
+    <Text fontSize="16">Last Name: {user.lastName}</Text>
+    <Text fontSize="16">Role: {user.role}</Text>
     
 
     <Button colorScheme="pink" variant="solid" onClick={handleLogout}>Logout</Button>

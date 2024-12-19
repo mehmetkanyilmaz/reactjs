@@ -1,5 +1,5 @@
 import { useState, createContext, useEffect, useContext } from "react"
-import { fetchLogout, fetchMe } from "../api";
+import { fetchMe } from "../api";
 import { Flex, Spinner } from '@chakra-ui/react'
 
 const AuthContext = createContext();
@@ -12,12 +12,16 @@ const AuthProvider = ({ children }) => {
     useEffect(() => {
         (async () => {
             try {
-                // TODO: api yazılınca düzenenecek
-                // const me = await fetchMe()
-                const me = {"accessToken":"sadsadasdsdasda5sda1sd", "refreshToken":"sadsadasdsdasda5sda1sd", "user":{"ad":"mehmet", "soyad":"kanyılmaz", "role":"admin"}}
+                const me = await fetchMe()
 
-                setLoggedIn(true)
-                setUser(me.user)
+                if(me == null || me.accessToken == null) {
+                    setLoggedIn(false)
+                    setUser(null)
+                }
+                else {
+                    setLoggedIn(true)
+                    setUser(me)
+                }
 
                 setLoading(false)
             }
@@ -29,18 +33,15 @@ const AuthProvider = ({ children }) => {
 
     const login = (data) => {
         setLoggedIn(true)
-        setUser(data.user)
+        setUser(data)
 
         localStorage.setItem('access-token', data.accessToken)
-        localStorage.setItem('refresh-token', data.refreshToken)
+        // localStorage.setItem('refresh-token', data.refreshToken)
     }
 
     const logout = async (callback) =>  {
         setLoggedIn(false)
         setUser(null)
-
-        // TODO: api yazılınca düzenlenecek
-        // await fetchLogout()
 
         localStorage.removeItem('access-token')
         localStorage.removeItem('refresh-token')

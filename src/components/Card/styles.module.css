@@ -1,0 +1,19 @@
+.addToBasketButton {
+    background-color: green;
+    color:green;
+}
+
+.addToBasketButton:hover {
+    background-color: green.500;
+    color:white;
+}
+
+.removeFromBasketButton {
+    background-color: pink;
+    color:pink;
+}
+
+.removeFromBasketButton:hover {
+    background-color: pink.500;
+    color:white;
+}

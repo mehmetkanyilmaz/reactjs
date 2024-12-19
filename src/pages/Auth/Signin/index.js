@@ -20,12 +20,10 @@ function Signin() {
     validationSchema,
     onSubmit: async(values, bag) => {
       try{
-        // TODO: api yazılınca düzenlenecek.
-        // const loginResponse = await fetchLogin({ email: values.email, password: values.password })
-        
-        // login(loginResponse)
-        const data = {"accessToken":"sadsadasdsdasda5sda1sd", "refreshToken":"sadsadasdsdasda5sda1sd", "user":{"ad":"mehmet", "soyad":"kanyılmaz", "role":"admin"}}
-        login(data)
+
+        const loginResponse = await fetchLogin({ email: values.email, password: values.password })
+        login(loginResponse)
+
       }
       catch(e) {
         bag.setErrors({ general: e.response.data.message });

@@ -7,26 +7,27 @@ import validationSchema from './validation';
 import { fetchRegister } from "../../../api"
 
 import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom'
 
 function Signup() {
 
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
-      passwordConfirm: ""
+      passwordConfirm: "",
+      firstName: "",
+      lastName: ""
     },
     validationSchema,
     onSubmit: async(values, bag) => {
       try{
-        // TODO: api yazılınca düzenlenecek.
-        // const registerResponse = await fetchRegister({ email: values.email, password: values.password })
-        
-        // login(registerResponse)
-        const data = {"accessToken":"sadsadasdsdasda5sda1sd", "refreshToken":"sadsadasdsdasda5sda1sd", "user":{"ad":"mehmet", "soyad":"kanyılmaz", "role":"admin"}}
-        login(data)
+        const registerResponse = await fetchRegister({ Email: values.email, Password: values.password, FistName: values.firstName, LastName: values.lastName })
+        login(registerResponse)
+        navigate('/')
       }
       catch(e) {
         bag.setErrors({ general: e.response.data.message });
@@ -47,6 +48,17 @@ function Signup() {
 
           <Box my={5} textAlign="left">
             <form onSubmit={formik.handleSubmit}>
+
+             <FormControl>
+                <FormLabel>First Name</FormLabel>
+                <Input name="firstName" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.firstName} isInvalid={formik.touched.firstName && formik.errors.firstName}/>
+             </FormControl>
+
+              <FormControl>
+                <FormLabel>Last Name</FormLabel>
+                <Input name="lastName" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.lastName} isInvalid={formik.touched.lastName && formik.errors.lastName}/>
+              </FormControl>
+
               <FormControl>
                 <FormLabel>E-mail</FormLabel>
                 <Input name="email" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.email} isInvalid={formik.touched.email && formik.errors.email}/>

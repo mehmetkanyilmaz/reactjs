@@ -17,10 +17,8 @@ function ProductDetail() {
 
      if (error) return <div>An error has occurred: ' + {error.message}</div>
 
-    console.log("data",data)
-
     const findBasketItem = items.find((item) => item.id == productId)
-    const images = data.images.map((url) => ({original: url}))
+    const images = data.images.map(image => ({original: image.image}))
   return (
     <div>
         <Button colorScheme={findBasketItem ? "pink":"green"} onClick={() => addToBasket(data, findBasketItem)}>
